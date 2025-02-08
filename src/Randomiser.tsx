@@ -15,9 +15,23 @@ function Randomiser(): React.JSX.Element {
 		"some text 10",
 		"some text 11",
 		"some text 12",
+		// "some text 13",
+		// "some text 14",
+		// "some text 15",
+		// "some text 16",
+		// "some text 17",
+		// "some text 18",
+		// "some text 19",
+		// "some text 20",
+		// "some text 21",
+		// "some text 22",
+		// "some text 23",
+		// "some text 24",
 	];
 
-	let wheelTurning = false;
+	let wheelTurning:boolean = false;
+
+	let clickTime:number = 0;
 
 	const sectorAngle = 360 / listOfOptions.length;
 	let currentAngle = 0;
@@ -27,9 +41,9 @@ function Randomiser(): React.JSX.Element {
 	  transform: rotate(${180 - sectorAngle}deg);
 	}
 	.randomiser .sector .text {
-	  transform: rotate(-${sectorAngle / 2}deg);
+	  transform: rotate(${listOfOptions.length > 2 ? (-sectorAngle / 2) : 0}deg);
 	  right: ${sectorAngle / 10}vmin;
-	  bottom: ${sectorAngle * 0.14}vmin;
+	  bottom: ${listOfOptions.length > 2 ? sectorAngle * 0.14 : 20}vmin;
 	}
 	`;
 
@@ -41,8 +55,8 @@ function Randomiser(): React.JSX.Element {
 		`;
 	}
 
-	let sectors = listOfOptions.map((text) => {
-		return <Sector text={text} />;
+	let sectors = listOfOptions.map((text, index) => {
+		return <Sector text={text} key={index} />;
 	});
 
 	const turnTheWheel = (event: any) => {
@@ -50,7 +64,8 @@ function Randomiser(): React.JSX.Element {
 			return;
 		}
 
-		const seed = 0.5 + Math.random() * 0.5;
+		const timeBasedSeed = (clickTime % 1000) / 1000;
+		const seed = 0.5 + Math.random() * 0.1 + timeBasedSeed * 0.4;
 		const initialSpeed = 180 * seed;
 		let currentSpeedPerStep = initialSpeed / 20;
 		const currentElement = event.currentTarget;
@@ -58,11 +73,12 @@ function Randomiser(): React.JSX.Element {
 
 		wheelTurning = true;
 
+		// start audio
 		audioElement.play();
 
 		setTimeout(function step() {
 			currentAngle += currentSpeedPerStep;
-			currentSpeedPerStep -= 0.02;
+			currentSpeedPerStep -= 0.01;
 
 			if (currentAngle >= 360) {
 				currentAngle -= 360;
@@ -74,14 +90,33 @@ function Randomiser(): React.JSX.Element {
 				setTimeout(step, 20);
 			} else {
 				wheelTurning = false;
+
+				// stop audio
 				audioElement.pause();
 				audioElement.currentTime = 0;
+
+				const countOfSectors = Math.floor(currentAngle / sectorAngle) - 1;
+				const currentSector = countOfSectors < 0 ? 1 : listOfOptions.length - countOfSectors;
+				const currentIndex = currentSector - 1;
+				console.log("Current sector:", currentSector, listOfOptions[currentIndex]);
 			}
 			
 		}, 20);
 	};
 
-	return <div className="randomiser" onClick={turnTheWheel}>
+	const startCalculatingTime = (event: any) => {
+		if (event.button === 0) {
+			clickTime = new Date().getTime();
+		}
+	};
+
+	const stopCalculatingTime = (event: any) => {
+		if (event.button === 0) {
+			clickTime = new Date().getTime() - clickTime;
+		}
+	}
+
+	return <div className="randomiser" onClick={turnTheWheel} onMouseDown={startCalculatingTime} onMouseUp={stopCalculatingTime}>
 		{sectors}
 		<style>{styles}</style>
 		<audio src="/baraban_superigri.mp3"></audio>
