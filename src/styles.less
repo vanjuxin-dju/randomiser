@@ -5,13 +5,51 @@ html, body {
     font-size: 1rem;
 }
 
+.randomiser-wrapper {
+    margin: 5vmin;
+    position: relative;
+    display: flex;
+    gap: 5vmin;
+
+    &::before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 0;
+        position: absolute;
+        border-top: 5vmin solid transparent;
+        border-bottom: 5vmin solid transparent;
+        border-right: 5vmin solid darkblue;
+        top: 25vmin;
+        left: 60vmin;
+    }
+}
+
+.info {
+    width: calc(100% - 65vmin);
+}
+
 .randomiser {
     width: 60vmin;
     height: 60vmin;
     position: relative;
     transform-origin: 50% 50%;
     transform: rotate(0deg);
-    z-index: 100;
+    box-sizing: border-box;
+
+    &::before {
+        content: "";
+        display: block;
+        width: 20vmin;
+        height: 20vmin;
+        margin: 20vmin;
+        position: absolute;
+        border: 0.2vmin solid darkblue;
+        background-color: white;
+        border-radius: 10vmin;
+        z-index: 10;
+        box-sizing: border-box;
+    }
 
     .sector {
         overflow:hidden;
@@ -19,46 +57,49 @@ html, body {
         height: 30vmin;
         position: absolute;
         transform-origin: 50% 100%;
-        z-index: 99;
-
-        &:nth-child(2n)::before {
-            background-color: aqua;
-        }
+        box-sizing: border-box;
 
         &::before {
             content: "";
             display: block;
             width: 60vmin;
             height: 30vmin;
-            background-color: blue;
+            background-color: deepskyblue;
             border-top-right-radius: 30vmin;
             border-top-left-radius: 30vmin;
             transform-origin: 50% 100%;
-            //transform: rotate(120deg); /* angle = 360 / sectorsCount; here = 180 - angle */
+            box-sizing: border-box;
+            border: 0.2vmin solid darkblue;
+        }
+
+        &:nth-child(2n)::before {
+            background-color: aqua;
+        }
+
+        &:nth-child(4n+1)::before {
+            background-color: dodgerblue;
+        }
+
+        &:nth-child(1)::before {
+            background-color: cadetblue;
         }
 
         .text {
             position: absolute;
             font-size: 2vmin;
-            //bottom: 2vmin; /* 1vmin == 10deg, 2.7 == 20 deg, 4.5 == 30deg, 6.5 == 40deg, 10 == 60deg; step = 0.18 */
-            //right: 2vmin; /* 1vmin == 10deg, 2 == 20deg, 3 == 30deg, 4 == 40deg, 6 == 60deg */
-            //transform: rotate(-30deg); /* angle / 2 */
+            box-sizing: border-box;
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            width: 1vmin;
+            height: 1vmin;
+            border-radius: 50%;
+            background-color: gold;
+            position: absolute;
+            bottom: 0.3vmin;
+            right: 0.3vmin;
         }
     }
 }
-
-// .randomiser .sector:nth-child(2) { /* nth-child(sectorNumber + 1); rotate(angle * sectorNumber); where sectorNumber from 0 to (sectorsCount - 1) */
-//     transform: rotate(60deg);
-// }
-// .randomiser .sector:nth-child(3) {
-//     transform: rotate(120deg);
-// }
-// .randomiser .sector:nth-child(4) {
-//     transform: rotate(180deg);
-// }
-// .randomiser .sector:nth-child(5) {
-//     transform: rotate(240deg);
-// }
-// .randomiser .sector:nth-child(6) {
-//     transform: rotate(300deg);
-// }
