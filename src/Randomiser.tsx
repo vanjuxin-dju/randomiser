@@ -1,39 +1,13 @@
-import React from "react"
+import React, { useRef } from "react"
 import Sector from "./Sector";
 
-function Randomiser(): React.JSX.Element {
-	let listOfOptions:string[] = [
-		"some text 1",
-		"some text 2",
-		"some text 3",
-		"some text 4",
-		"some text 5",
-		"some text 6",
-		"some text 7",
-		"some text 8",
-		"some text 9",
-		"some text 10",
-		"some text 11",
-		"some text 12",
-		// "some text 13",
-		// "some text 14",
-		// "some text 15",
-		// "some text 16",
-		// "some text 17",
-		// "some text 18",
-		// "some text 19",
-		// "some text 20",
-		// "some text 21",
-		// "some text 22",
-		// "some text 23",
-		// "some text 24",
-	];
-
+function Randomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
+	let audioRef = useRef(null);
 	let wheelTurning:boolean = false;
 
 	let clickTime:number = 0;
 
-	const sectorAngle = 360 / listOfOptions.length;
+	const sectorAngle = 360 / options.length;
 	let currentAngle = 0;
 
 	let styles = `
@@ -41,13 +15,13 @@ function Randomiser(): React.JSX.Element {
 	  transform: rotate(${180 - sectorAngle}deg);
 	}
 	.randomiser .sector .text {
-	  transform: rotate(${listOfOptions.length > 2 ? (-sectorAngle / 2) : 0}deg);
+	  transform: rotate(${options.length > 2 ? (-sectorAngle / 2) : 0}deg);
 	  right: ${sectorAngle / 10}vmin;
-	  bottom: ${listOfOptions.length > 2 ? sectorAngle * 0.14 : 20}vmin;
+	  bottom: ${options.length > 2 ? sectorAngle * 0.14 : 20}vmin;
 	}
 	`;
 
-	for (let i = 1; i < listOfOptions.length; i++) {
+	for (let i = 1; i < options.length; i++) {
 		styles += `
 		.randomiser .sector:nth-child(${i + 1}) {
           transform: rotate(${sectorAngle * i}deg);
@@ -55,9 +29,29 @@ function Randomiser(): React.JSX.Element {
 		`;
 	}
 
-	let sectors = listOfOptions.map((text, index) => {
+	let sectors = options.map((text, index) => {
 		return <Sector text={text} key={index} />;
 	});
+
+	const audioControlsWrapper = {
+		play: () => {
+			const audioElement: any = audioRef.current;
+			audioElement.volume = 1;
+			audioElement.play();
+		},
+		stop: () => {
+			const audioElement: any = audioRef.current;
+			setTimeout(function fade() {
+				if (audioElement.volume > 0) {
+					audioElement.volume = (audioElement.volume - 0.05).toFixed(2);
+					setTimeout(fade, 40);
+				} else {
+					audioElement.pause();
+					audioElement.currentTime = 0;
+				}
+			}, 40)
+		}
+	};
 
 	const turnTheWheel = (event: any) => {
 		if (wheelTurning) {
@@ -69,12 +63,10 @@ function Randomiser(): React.JSX.Element {
 		const initialSpeed = 180 * seed;
 		let currentSpeedPerStep = initialSpeed / 20;
 		const currentElement = event.currentTarget;
-		const audioElement = currentElement.querySelector("audio");
 
 		wheelTurning = true;
 
-		// start audio
-		audioElement.play();
+		audioControlsWrapper.play();
 
 		setTimeout(function step() {
 			currentAngle += currentSpeedPerStep;
@@ -91,14 +83,13 @@ function Randomiser(): React.JSX.Element {
 			} else {
 				wheelTurning = false;
 
-				// stop audio
-				audioElement.pause();
-				audioElement.currentTime = 0;
+				audioControlsWrapper.stop();
 
 				const countOfSectors = Math.floor(currentAngle / sectorAngle) - 1;
-				const currentSector = countOfSectors < 0 ? 1 : listOfOptions.length - countOfSectors;
+				const currentSector = countOfSectors < 0 ? 1 : options.length - countOfSectors;
 				const currentIndex = currentSector - 1;
-				console.log("Current sector:", currentSector, listOfOptions[currentIndex]);
+
+				setCurrentSector(options[currentIndex]);
 			}
 			
 		}, 20);
@@ -119,7 +110,7 @@ function Randomiser(): React.JSX.Element {
 	return <div className="randomiser" onClick={turnTheWheel} onMouseDown={startCalculatingTime} onMouseUp={stopCalculatingTime}>
 		{sectors}
 		<style>{styles}</style>
-		<audio src="/baraban_superigri.mp3"></audio>
+		<audio ref={audioRef} src="/baraban_superigri.mp3"></audio>
 	</div>;
 }
 
