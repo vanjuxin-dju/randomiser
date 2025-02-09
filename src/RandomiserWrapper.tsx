@@ -1,12 +1,28 @@
 import Randomiser from "./Randomiser";
-import React from "react";
+import React, { useState } from "react";
 
 function RandomiserWrapper(): React.JSX.Element {
+    const [currentSector, setCurrentSector] = useState("");
+    const [options, setOptions] = useState(["option 1", "option 2"]);
+
+    const onChange = (event: any) => {
+        const currentElement = event.currentTarget;
+        const values = currentElement.value.split('\n');
+
+        setOptions(values.filter((element: any) => element.length > 0));
+    }
+
     return <div className="randomiser-wrapper">
-        <Randomiser />
+        <Randomiser setCurrentSector={setCurrentSector} options={options} />
         <div className="info">
             <h1>Click the wheel to make a turn!</h1>
+            <div className="current-sector">Current sector: <b>{currentSector}</b></div>
+            <div className="options">
+                <p>Available options:</p>
+                <textarea onChange={onChange}></textarea>
+            </div>
         </div>
+
     </div>;
 }
 
