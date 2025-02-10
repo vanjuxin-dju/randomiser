@@ -7,7 +7,7 @@ function Randomiser({ setCurrentSector, options } : { setCurrentSector : Functio
 
 	let clickTime:number = 0;
 
-	const sectorAngle = 360 / options.length;
+	const sectorAngle = options.length > 0 ? 360 / options.length : 360;
 	let currentAngle = 0;
 
 	let styles = `
@@ -33,6 +33,10 @@ function Randomiser({ setCurrentSector, options } : { setCurrentSector : Functio
 		return <Sector text={text} key={index} />;
 	});
 
+	if (sectors.length === 0) {
+		sectors.push(<Sector text={"Please add options on the right"} key={0} />);
+	}
+
 	const audioControlsWrapper = {
 		play: () => {
 			const audioElement: any = audioRef.current;
@@ -54,18 +58,15 @@ function Randomiser({ setCurrentSector, options } : { setCurrentSector : Functio
 	};
 
 	const turnTheWheel = (event: any) => {
-		if (wheelTurning) {
+		if (wheelTurning || options.length === 0) {
 			return;
 		}
 
-		const timeBasedSeed = (clickTime % 1000) / 1000;
-		const seed = 0.5 + Math.random() * 0.1 + timeBasedSeed * 0.4;
-		const initialSpeed = 180 * seed;
-		let currentSpeedPerStep = initialSpeed / 20;
+		const seed = 0.5 + Math.random() * 0.1 + ((clickTime % 1000) / 1000) * 0.4;
+		let currentSpeedPerStep = 180 * seed / 20;
 		const currentElement = event.currentTarget;
 
 		wheelTurning = true;
-
 		audioControlsWrapper.play();
 
 		setTimeout(function step() {
@@ -82,12 +83,10 @@ function Randomiser({ setCurrentSector, options } : { setCurrentSector : Functio
 				setTimeout(step, 20);
 			} else {
 				wheelTurning = false;
-
 				audioControlsWrapper.stop();
 
 				const countOfSectors = Math.floor(currentAngle / sectorAngle) - 1;
-				const currentSector = countOfSectors < 0 ? 1 : options.length - countOfSectors;
-				const currentIndex = currentSector - 1;
+				const currentIndex = (countOfSectors < 0 ? 1 : options.length - countOfSectors) - 1;
 
 				setCurrentSector(options[currentIndex]);
 			}

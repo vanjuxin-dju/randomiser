@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 function RandomiserWrapper(): React.JSX.Element {
     const [currentSector, setCurrentSector] = useState("");
-    const [options, setOptions] = useState(["option 1", "option 2"]);
+    const [options, setOptions] = useState([] as string[]);
 
     const onChange = (event: any) => {
         const currentElement = event.currentTarget;
@@ -19,7 +19,7 @@ function RandomiserWrapper(): React.JSX.Element {
             <div className="current-sector">Current sector: <b>{currentSector}</b></div>
             <div className="options">
                 <p>Available options:</p>
-                <textarea onChange={onChange}></textarea>
+                <textarea onChange={onChange} defaultValue={options.join('\n')} placeholder="Please add options here, one per line"></textarea>
             </div>
         </div>
 
