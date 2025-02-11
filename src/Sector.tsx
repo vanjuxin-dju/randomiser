@@ -1,9 +1,9 @@
 import React from "react";
 
 function Sector({ text } : { text : string }) : React.JSX.Element {
-    return <div className="sector">
+    return <section className="sector">
         <div className="text">{text}</div>
-    </div>;
+    </section>;
 }
 
 export default Sector;
