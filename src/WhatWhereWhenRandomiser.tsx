@@ -1,7 +1,6 @@
 import React, { useRef } from "react"
 import Sector from "./Sector";
 import { AudioControlsAdapter } from "./modules/AudioControlsAdapter";
-import { addStylesToAllocateSectors } from "./modules/Util";
 
 function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
     let audioRef = useRef(null);
@@ -14,11 +13,11 @@ function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSec
     const audioControlsAdapter = new AudioControlsAdapter(audioRef);
 
 	let sectors = options.map((text, index) => {
-		return <Sector text={text} key={index} />;
+		return <Sector text={text} optionsLength={options.length} sectorAngle={sectorAngle} index={index} key={index} />;
 	});
 
 	if (sectors.length === 0) {
-		sectors.push(<Sector text={"Please add options on the right"} key={0} />);
+		sectors.push(<Sector text={"Please add options on the right"} optionsLength={options.length} sectorAngle={sectorAngle} index={0} key={0} />);
 	}
 
     const startCalculatingTime = (event: any) => {
@@ -72,7 +71,6 @@ function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSec
 
     return <div className="randomiser what-where-when">
 		{sectors}
-		<style>{addStylesToAllocateSectors(sectorAngle, options.length)}</style>
         <div className="spinning-top" onClick={turnTheSpinningTop} onMouseDown={startCalculatingTime} onMouseUp={stopCalculatingTime}></div>
         <audio ref={audioRef} src="/volchok.mp3"></audio>
 	</div>;
