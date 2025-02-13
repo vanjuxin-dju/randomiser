@@ -3,7 +3,7 @@ import Sector from "./Sector";
 import { AudioControlsAdapter } from "./modules/AudioControlsAdapter";
 
 function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
-    let audioRef = useRef(null);
+    let audioRef:React.RefObject<HTMLAudioElement|null> = useRef<HTMLAudioElement|null>(null);
     let clickTime:number = 0;
     let spinningTopTurning:boolean = false;
 
@@ -20,19 +20,19 @@ function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSec
 		sectors.push(<Sector text={"Please add options on the right"} optionsLength={options.length} sectorAngle={sectorAngle} index={0} key={0} />);
 	}
 
-    const startCalculatingTime = (event: any) => {
+    const startCalculatingTime = (event: React.MouseEvent<HTMLElement>) => {
 		if (event.button === 0) {
 			clickTime = new Date().getTime();
 		}
 	};
 
-	const stopCalculatingTime = (event: any) => {
+	const stopCalculatingTime = (event: React.MouseEvent<HTMLElement>) => {
 		if (event.button === 0) {
 			clickTime = new Date().getTime() - clickTime;
 		}
 	}
 
-    const turnTheSpinningTop = (event: any) => {
+    const turnTheSpinningTop = (event: React.MouseEvent<HTMLElement>) => {
 		if (spinningTopTurning || options.length === 0) {
 			return;
 		}

@@ -13,16 +13,16 @@ function RandomiserWrapper(): React.JSX.Element {
 
     const [currentRandomiser, setCurrentRandomiser] = useState(RandomiserType.THE_FIELD_OF_WONDERS);
 
-    const onChange = (event: any) => {
+    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const currentElement = event.currentTarget;
         const values = currentElement.value.split('\n');
 
-        setOptions(values.filter((element: any) => element.length > 0));
+        setOptions(values.filter((element) => element.length > 0));
     }
 
-    const onChangeType = (event: any) => {
+    const onChangeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const currentElement = event.currentTarget;
-        setCurrentRandomiser(currentElement.value);
+        setCurrentRandomiser(parseInt(currentElement.value));
     }
 
     return <div className="randomiser-wrapper">

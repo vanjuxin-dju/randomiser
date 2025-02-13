@@ -3,7 +3,7 @@ import Sector from "./Sector";
 import { AudioControlsAdapter } from "./modules/AudioControlsAdapter";
 
 function TheFieldOfWondersRandomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
-	let audioRef = useRef(null);
+	let audioRef:React.RefObject<HTMLAudioElement|null> = useRef<HTMLAudioElement|null>(null);
 	let wheelTurning:boolean = false;
 
 	let clickTime:number = 0;
@@ -21,7 +21,7 @@ function TheFieldOfWondersRandomiser({ setCurrentSector, options } : { setCurren
 
 	const audioControlsAdapter = new AudioControlsAdapter(audioRef);
 
-	const turnTheWheel = (event: any) => {
+	const turnTheWheel = (event: React.MouseEvent<HTMLElement>) => {
 		if (wheelTurning || options.length === 0) {
 			return;
 		}
@@ -58,13 +58,13 @@ function TheFieldOfWondersRandomiser({ setCurrentSector, options } : { setCurren
 		}, 20);
 	};
 
-	const startCalculatingTime = (event: any) => {
+	const startCalculatingTime = (event: React.MouseEvent<HTMLElement>) => {
 		if (event.button === 0) {
 			clickTime = new Date().getTime();
 		}
 	};
 
-	const stopCalculatingTime = (event: any) => {
+	const stopCalculatingTime = (event: React.MouseEvent<HTMLElement>) => {
 		if (event.button === 0) {
 			clickTime = new Date().getTime() - clickTime;
 		}
