@@ -1,21 +1,29 @@
 export class AudioControlsAdapter {
-    private audioRef: React.RefObject<any>;
+    private audioRef: React.RefObject<HTMLAudioElement|null>;
 
-    constructor(audioRef: React.RefObject<any>) {
+    constructor(audioRef: React.RefObject<HTMLAudioElement|null>) {
         this.audioRef = audioRef;
     }
 
     public play() {
-        const audioElement: any = this.audioRef.current;
+        const audioElement: HTMLAudioElement|null = this.audioRef.current;
+        if (audioElement == null) {
+            return;
+        }
+
         audioElement.volume = 1;
         audioElement.play();
     }
 
     public stop() {
-        const audioElement: any = this.audioRef.current;
+        const audioElement: HTMLAudioElement|null = this.audioRef.current;
+        if (audioElement == null) {
+            return;
+        }
+
         setTimeout(function fade() {
             if (audioElement.volume > 0) {
-                audioElement.volume = (audioElement.volume - 0.05).toFixed(2);
+                audioElement.volume = parseFloat((audioElement.volume - 0.05).toFixed(2));
                 setTimeout(fade, 40);
             } else {
                 audioElement.pause();
