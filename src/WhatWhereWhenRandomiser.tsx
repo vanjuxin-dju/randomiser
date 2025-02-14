@@ -1,14 +1,15 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import Sector from "./Sector";
 import { AudioControlsAdapter } from "./modules/AudioControlsAdapter";
+import { animate } from "./modules/Util";
 
 function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
+	const [currentAngle, setCurrentAngle] = useState(0);
     let audioRef:React.RefObject<HTMLAudioElement|null> = useRef<HTMLAudioElement|null>(null);
     let clickTime:number = 0;
     let spinningTopTurning:boolean = false;
 
     const sectorAngle = options.length > 0 ? 360 / options.length : 360;
-    let currentAngle = 0;
 
     const audioControlsAdapter = new AudioControlsAdapter(audioRef);
 
@@ -37,36 +38,19 @@ function WhatWhereWhenRandomiser({ setCurrentSector, options } : { setCurrentSec
 			return;
 		}
 
-		const seed = 0.5 + Math.random() * 0.1 + ((clickTime % 1000) / 1000) * 0.4;
-		let currentSpeedPerStep = 360 * seed / 20;
-		const currentElement = event.currentTarget;
-
 		spinningTopTurning = true;
 		audioControlsAdapter.play();
 
-		setTimeout(function step() {
-			currentAngle += currentSpeedPerStep;
-			currentSpeedPerStep -= 0.015;
+		animate(360, clickTime, 0.015, event.currentTarget, currentAngle, (angle: number) => {
+			setCurrentAngle(angle);
+			spinningTopTurning = false;
+			audioControlsAdapter.stop();
 
-			if (currentAngle >= 360) {
-				currentAngle -= 360;
-			}
+			const countOfSectors = Math.floor(angle / sectorAngle) + 1;
+			const currentIndex = countOfSectors === options.length ? 0 : countOfSectors;
 
-			currentElement.style.transform = `rotate(${currentAngle}deg)`;
-
-			if (currentSpeedPerStep >= 0) {
-				setTimeout(step, 20);
-			} else {
-				spinningTopTurning = false;
-				audioControlsAdapter.stop();
-
-				const countOfSectors = Math.floor(currentAngle / sectorAngle) + 1;
-				const currentIndex = countOfSectors === options.length ? 0 : countOfSectors;
-
-				setCurrentSector(options[currentIndex]);
-			}
-			
-		}, 20);
+			setCurrentSector(options[currentIndex]);
+		});
 	};
 
     return <div className="randomiser what-where-when">
