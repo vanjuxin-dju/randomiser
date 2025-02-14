@@ -1,15 +1,16 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import Sector from "./Sector";
 import { AudioControlsAdapter } from "./modules/AudioControlsAdapter";
+import { animate } from "./modules/Util";
 
 function TheFieldOfWondersRandomiser({ setCurrentSector, options } : { setCurrentSector : Function, options : string[] }): React.JSX.Element {
+	const [currentAngle, setCurrentAngle] = useState(0);
 	let audioRef:React.RefObject<HTMLAudioElement|null> = useRef<HTMLAudioElement|null>(null);
 	let wheelTurning:boolean = false;
 
 	let clickTime:number = 0;
 
-	const sectorAngle = options.length > 0 ? 360 / options.length : 360;
-	let currentAngle = 0;
+	const sectorAngle: number = options.length > 0 ? 360 / options.length : 360;
 
 	let sectors = options.map((text, index) => {
 		return <Sector text={text} optionsLength={options.length} sectorAngle={sectorAngle} index={index} key={index} />;
@@ -26,36 +27,18 @@ function TheFieldOfWondersRandomiser({ setCurrentSector, options } : { setCurren
 			return;
 		}
 
-		const seed = 0.5 + Math.random() * 0.1 + ((clickTime % 1000) / 1000) * 0.4;
-		let currentSpeedPerStep = 180 * seed / 20;
-		const currentElement = event.currentTarget;
-
 		wheelTurning = true;
 		audioControlsAdapter.play();
+		animate(180, clickTime, 0.01, event.currentTarget, currentAngle, (angle: number) => {
+			setCurrentAngle(angle);
+			wheelTurning = false;
+			audioControlsAdapter.stop();
 
-		setTimeout(function step() {
-			currentAngle += currentSpeedPerStep;
-			currentSpeedPerStep -= 0.01;
+			const countOfSectors = Math.floor(angle / sectorAngle) - 1;
+			const currentIndex = (countOfSectors < 0 ? 1 : options.length - countOfSectors) - 1;
 
-			if (currentAngle >= 360) {
-				currentAngle -= 360;
-			}
-
-			currentElement.style.transform = `rotate(${currentAngle}deg)`;
-
-			if (currentSpeedPerStep >= 0) {
-				setTimeout(step, 20);
-			} else {
-				wheelTurning = false;
-				audioControlsAdapter.stop();
-
-				const countOfSectors = Math.floor(currentAngle / sectorAngle) - 1;
-				const currentIndex = (countOfSectors < 0 ? 1 : options.length - countOfSectors) - 1;
-
-				setCurrentSector(options[currentIndex]);
-			}
-			
-		}, 20);
+			setCurrentSector(options[currentIndex]);
+		});
 	};
 
 	const startCalculatingTime = (event: React.MouseEvent<HTMLElement>) => {
